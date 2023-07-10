@@ -132,6 +132,7 @@ AND dea.date = vac.date
 WHERE dea.continent IS NOT NULL
 ORDER BY 2,3
 
+	
 /*Use CTE in order to use the newly created column*/
 WITH PopVsVac (continent, location, date, population, new_vaccinations, TotalPeopleVaccinated)
 AS
@@ -147,6 +148,7 @@ AS
 SELECT *, (TotalPeopleVaccinated/population)*100 AS PercentageVaccinated
 FROM PopVsVac
 ORDER BY location, date;
+
 
 /*Using Temp tables*/
 DROP TABLE IF EXISTS #PercentPopulationVaccinated
@@ -185,6 +187,7 @@ WHERE dea.continent IS NOT NULL
 SELECT *
 FROM PercentPopulationVaccinated
 
+/*Creating a view to store data for visualization*/
 IF OBJECT_ID('dbo.HighestDeathRate', 'V') IS NOT NULL
     DROP VIEW dbo.HighestDeathRate;
 
