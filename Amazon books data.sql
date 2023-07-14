@@ -172,7 +172,36 @@ GROUP BY language
 ORDER BY book_count DESC;
 
 
+--publisher analysis
+--top publishers based on the number of books published/avg.reviews
+SELECT publisher_name,
+       COUNT(*) AS book_count,
+       AVG(avg_reviews) AS average_reviews
+FROM amazonbooks
+GROUP BY publisher_name
+ORDER BY book_count DESC, average_reviews DESC;
 
+--analyzing the distribution of book rices across different publishers and determining if there is a correlation btn the publisher and the books success
+SELECT publisher_name,
+       MIN(price) AS min_price,
+       MAX(price) AS max_price,
+       AVG(price) AS avg_price,
+       COUNT(*) AS book_count
+FROM amazonbooks
+GROUP BY publisher_name
+ORDER BY avg_price DESC;
+
+--with correlation with price, reviews and pages
+SELECT publisher_name,
+       MIN(price) AS min_price,
+       MAX(price) AS max_price,
+       AVG(price) AS avg_price,
+       AVG(avg_reviews) AS avg_reviews,
+       AVG(pages) AS avg_pages,
+       COUNT(*) AS book_count
+FROM amazonbooks
+GROUP BY publisher_name
+ORDER BY avg_reviews DESC;
 
 
 
