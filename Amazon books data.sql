@@ -294,7 +294,71 @@ GROUP BY title,
 ORDER BY
     weight_category;
 
+-- Create a view to analyze book weight and reviews
+CREATE VIEW WeightReviewsAnalysis AS
+SELECT
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END AS weight_category,
+    AVG(avg_reviews) AS average_reviews,
+    weight
+FROM
+    amazonbooks
+WHERE
+    ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1
+GROUP BY
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END,
+    weight;
 
+-- Query the WeightReviewsAnalysis view
+SELECT * FROM WeightReviewsAnalysis;
+
+-- Create a view to analyze book weight and sales
+CREATE VIEW WeightSalesAnalysis AS
+SELECT
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END AS weight_category,
+    SUM(price) AS total_sales,
+    weight
+FROM
+    amazonbooks
+WHERE
+    ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1
+GROUP BY
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END,
+    weight;
+
+-- Query the WeightSalesAnalysis view
+SELECT * FROM WeightSalesAnalysis;
 
 
 
