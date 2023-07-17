@@ -1,6 +1,6 @@
 SELECT *
 FROM amazonbooks
-
+---------------------------------------------------------------------------------------------------------------------------------
 /*Separating the publisher, edition, and the publication date on the table*/
 SELECT 
     CASE
@@ -22,33 +22,33 @@ SET publication_date = CASE
         WHEN CHARINDEX('(', publisher) > 0 THEN TRY_CONVERT(DATE, SUBSTRING(publisher, CHARINDEX('(', publisher) + 1, LEN(publisher) - CHARINDEX('(', publisher) - 1))
         ELSE NULL
     END;
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Add a new column for the publisher
 ALTER TABLE amazonbooks
 ADD publisher_name NVARCHAR(255);
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Update the values in the new column
 UPDATE amazonbooks
 SET publisher_name = CASE
         WHEN CHARINDEX('(', publisher) > 0 THEN LEFT(publisher, CHARINDEX('(', publisher) - 2)
         ELSE publisher
     END;
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Remove the publication date from the publisher column
 UPDATE amazonbooks
 SET publisher = CASE
         WHEN CHARINDEX('(', publisher) > 0 THEN SUBSTRING(publisher, CHARINDEX('(', publisher) + 1, LEN(publisher) - CHARINDEX('(', publisher) - 1)
         ELSE publisher
     END;
-
+---------------------------------------------------------------------------------------------------------------------------------
 /*removing the publisher column*/
 ALTER TABLE amazonbooks
 DROP COLUMN publisher
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Add a new column for the edition
 ALTER TABLE amazonbooks
 ADD edition NVARCHAR(255);
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Update the values in the new edition column
 UPDATE amazonbooks
 SET edition = CASE
@@ -56,7 +56,7 @@ SET edition = CASE
         ELSE ''
     END
 WHERE CHARINDEX(';', publisher_name) > 0;
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Remove the edition from the publisher column
 UPDATE amazonbooks
 SET publisher_name = CASE
@@ -64,7 +64,7 @@ SET publisher_name = CASE
         ELSE publisher_name
     END
 WHERE CHARINDEX(';', publisher_name) > 0;
-
+---------------------------------------------------------------------------------------------------------------------------------
 
 /*Price Analysis*/
 --distribution of book prices
@@ -107,7 +107,7 @@ SELECT
 FROM
   amazonbooks
 ORDER BY cost_per_page DESC
-
+---------------------------------------------------------------------------------------------------------------------------------
 --determining the price and language comparison
 SELECT title,language,price 
 FROM amazonbooks
@@ -120,7 +120,7 @@ FROM
   amazonbooks
 GROUP BY language
 ORDER BY highest_price DESC
-
+---------------------------------------------------------------------------------------------------------------------------------
 /*Review analysis*/
 --relationship between the average review and the star ratings
 SELECT AVG(avg_reviews) AS average_reviews, 
@@ -130,7 +130,7 @@ SELECT AVG(avg_reviews) AS average_reviews,
        AVG(star2) AS average_2_star,
        AVG(star1) AS average_1_star
 FROM amazonbooks;
-
+---------------------------------------------------------------------------------------------------------------------------------
 --determining if the books with higher average reviews tend to have a higher % of a 5 star rating
 SELECT title,AVG(avg_reviews) AS average_reviews,(SUM(star5) * 100) / (SUM(star1 + star2 + star3 + star4 + star5)) AS percentage_5_star
 FROM amazonbooks
@@ -142,7 +142,7 @@ FROM amazonbooks
 GROUP BY title
 HAVING (SUM(star5) * 100) / (SUM(star1 + star2 + star3 + star4 + star5)) IS NOT NULL
 ORDER BY percentage_5_star--,average_reviews DESC;
-
+---------------------------------------------------------------------------------------------------------------------------------
 --Language comparison
 --comparing the popularity and average reviews of books written in different languages
 SELECT language, COUNT(*) AS book_count, AVG(avg_reviews) AS average_reviews
@@ -171,7 +171,7 @@ FROM amazonbooks
 GROUP BY language
 ORDER BY book_count DESC;
 
-
+---------------------------------------------------------------------------------------------------------------------------------
 --publisher analysis
 --top publishers based on the number of books published/avg.reviews
 SELECT publisher_name,
@@ -202,7 +202,7 @@ SELECT publisher_name,
 FROM amazonbooks
 GROUP BY publisher_name
 ORDER BY avg_reviews DESC;
-
+---------------------------------------------------------------------------------------------------------------------------------
 --book lengths and reviews
 /*analyzes the number of books based on page number and the average reviews of books depending on the pages
 --can help deduce whether books with more pages tend to receive higher or lower rating*/
@@ -226,9 +226,9 @@ GROUP BY
     END
 ORDER BY
     page_range;
+---------------------------------------------------------------------------------------------------------------------------------
 
-
---Weigth analysis
+--Weight analysis
 -- Calculate the average number of reviews for different weight categories
 -- Calculate the average number of reviews for different weight categories
 SELECT title,
@@ -261,8 +261,7 @@ GROUP BY title,
 ORDER BY
     weight_category;
 
-
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Calculate the total sales for different weight categories
 SELECT title,
     CASE
@@ -294,6 +293,7 @@ GROUP BY title,
 ORDER BY
     weight_category;
 
+---------------------------------------------------------------------------------------------------------------------------------
 -- Create a view to analyze book weight and reviews
 CREATE VIEW WeightReviewsAnalysis AS
 SELECT
@@ -326,7 +326,7 @@ GROUP BY
 
 -- Query the WeightReviewsAnalysis view
 SELECT * FROM WeightReviewsAnalysis;
-
+---------------------------------------------------------------------------------------------------------------------------------
 -- Create a view to analyze book weight and sales
 CREATE VIEW WeightSalesAnalysis AS
 SELECT
