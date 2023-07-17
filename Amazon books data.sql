@@ -203,7 +203,96 @@ FROM amazonbooks
 GROUP BY publisher_name
 ORDER BY avg_reviews DESC;
 
+--book lengths and reviews
+/*analyzes the number of books based on page number and the average reviews of books depending on the pages
+--can help deduce whether books with more pages tend to receive higher or lower rating*/
+SELECT
+    CASE
+        WHEN pages < 100 THEN 'Less than 100 pages'
+        WHEN pages >= 100 AND pages < 200 THEN '100-199 pages'
+        WHEN pages >= 200 AND pages < 300 THEN '200-299 pages'
+        ELSE '300 or more pages'
+    END AS page_range,
+    COUNT(*) AS book_count,
+    AVG(avg_reviews) AS average_reviews
+FROM
+    amazonbooks
+GROUP BY
+    CASE
+        WHEN pages < 100 THEN 'Less than 100 pages'
+        WHEN pages >= 100 AND pages < 200 THEN '100-199 pages'
+        WHEN pages >= 200 AND pages < 300 THEN '200-299 pages'
+        ELSE '300 or more pages'
+    END
+ORDER BY
+    page_range;
 
+
+--Weigth analysis
+-- Calculate the average number of reviews for different weight categories
+-- Calculate the average number of reviews for different weight categories
+SELECT title,
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END AS weight_category,
+    AVG(avg_reviews) AS average_reviews,
+    weight
+FROM
+    amazonbooks
+WHERE
+    ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1
+GROUP BY title,
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END,
+    weight
+ORDER BY
+    weight_category;
+
+
+
+-- Calculate the total sales for different weight categories
+SELECT title,
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END AS weight_category,
+    SUM(price) AS total_sales,
+    weight
+FROM
+    amazonbooks
+WHERE
+    ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1
+GROUP BY title,
+    CASE
+        WHEN ISNUMERIC(REPLACE(weight, ' pounds', '')) = 1 THEN
+            CASE
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 1 THEN 'Lightweight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 1 AND CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) < 2 THEN 'Medium Weight'
+                WHEN CAST(REPLACE(weight, ' pounds', '') AS NUMERIC) >= 2 THEN 'Heavyweight'
+            END
+        ELSE 'Invalid Weight'
+    END,
+    weight
+ORDER BY
+    weight_category;
 
 
 
